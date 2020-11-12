@@ -28,6 +28,20 @@ namespace gps_time_viewer
             }
         }
 
+        private bool _isConnected = false;
+
+        public bool IsConnected
+        {
+            get => _isConnected;
+            set
+            {
+                if (value == _isConnected) return;
+
+                _isConnected = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

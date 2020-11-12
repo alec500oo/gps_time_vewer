@@ -5,12 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:gps_time_viewer"
         mc:Ignorable="d"
-        Title="GPS Time" Height="150" Width="400">
+        Title="GPS Time" Height="250" Width="400" MinHeight="250" MinWidth="400">
     <Window.DataContext>
         <local:GpsViewModel />
     </Window.DataContext>
-    <StackPanel>
-        <Label Content="{Binding GpsModule.UtcTime}" />
-        <Button Content="Update Time" Width="100" Command="{Binding UpdateTime}"/>
-    </StackPanel>
+    <DockPanel Height="Auto" Width="Auto" LastChildFill="True">
+        <DockPanel.Resources>
+            <Style TargetType="Control" x:Key="PanelStyle">
+                <Setter Property="Margin" Value="6" />
+            </Style>
+        </DockPanel.Resources>
+        <GroupBox DockPanel.Dock="Top" Header="Serial Connection" Style="{StaticResource PanelStyle}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel.Resources>
+                    <Style TargetType="Control" x:Key="CtlStyle">
+                        <Setter Property="Margin" Value="6" />
+                        <Setter Property="FontSize" Value="14" />
+                    </Style>
+                </StackPanel.Resources>
+                <ComboBox Width="100" Style="{StaticResource PanelStyle}" ItemsSource="{Binding PortsOnComputer}" SelectedIndex="0"/>
+                <TextBox Width="100" Text="{Binding BaudRate}" Style="{StaticResource CtlStyle}" />
+                <Button Width="100" Command="{Binding ConnectToDevice}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource CtlStyle}">
+                            <Setter Property="Content" Value="Connect"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding GpsModule.IsConnected}" Value="True">
+                                    <Setter Property="Content" Value="Disconnect"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </GroupBox>
+        <Label DockPanel.Dock="Bottom" Width="Auto" Height="Auto" Style="{StaticResource PanelStyle}"
+               VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32"
+               Content="{Binding GpsModule.UtcTime}" />
+    </DockPanel>
 </Window>
+    
