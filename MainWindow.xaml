@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:gps_time_viewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        Title="GPS Time" Height="150" Width="400">
+    <Window.DataContext>
+        <local:GpsViewModel />
+    </Window.DataContext>
+    <StackPanel>
+        <Label Content="{Binding GpsModule.UtcTime}" />
+        <Button Content="Update Time" Width="100" Command="{Binding UpdateTime}"/>
+    </StackPanel>
 </Window>

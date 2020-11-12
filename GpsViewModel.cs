@@ -1,32 +1,29 @@
 ﻿#nullable enable
 using System;
 using System.ComponentModel;
-using System.IO.Ports;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using JetBrains.Annotations;
 
 namespace gps_time_viewer
 {
-    /// <summary>
-    /// GPS data model for storing data received from the GPS serial device. This class also stores the serial
-    /// connection object for our hardware interface.
-    /// </summary>
-    internal class GpsModule : INotifyPropertyChanged
+    internal class GpsViewModel : INotifyPropertyChanged
     {
-        public SerialPort? Port;
+        private GpsModule _gpsModule = new GpsModule();
 
-        private DateTime _utcTime = DateTime.Now;
-
-        public DateTime UtcTime
+        public GpsModule GpsModule
         {
-            get => _utcTime;
+            get => _gpsModule;
             set
             {
-                if (value == _utcTime) return;
-                _utcTime = value;
+                if (value == _gpsModule) return;
+
+                _gpsModule = value;
                 OnPropertyChanged();
             }
         }
+
+        public ICommand UpdateTime => new RelayCommand(p => { _gpsModule.UtcTime = DateTime.Now; });
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
