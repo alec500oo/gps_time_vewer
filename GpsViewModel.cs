@@ -1,9 +1,9 @@
 ﻿#nullable enable
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO.Ports;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 
@@ -40,19 +40,58 @@ namespace gps_time_viewer
             }
         }
 
-        public ObservableCollection<string> PortsOnComputer => new ObservableCollection<string>()
-        {
-            "COM1",
-            "COM2"
-        };
+        private int _selectedIndex;
 
-        public ICommand UpdateTime => new RelayCommand(p => { _gpsModule.UtcTime = DateTime.Now; });
-
-        public ICommand ConnectToDevice => new RelayCommand(p =>
+        public int SelectedIndex
         {
-            _gpsModule.IsConnected = !_gpsModule.IsConnected;
-            MessageBox.Show(BaudRate.ToString(), "BaudRate");
+            get => _selectedIndex;
+            set
+            {
+                if (value == _selectedIndex) return;
+
+                _selectedIndex = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<string> PortsOnComputer { get; }
+
+        public GpsViewModel()
+        {
+            PortsOnComputer = new ObservableCollection<string>(SerialPort.GetPortNames());
+        }
+
+        public ICommand ToggleConnection => new RelayCommand(p =>
+        {
+            if (!_gpsModule.IsConnected) ConnectToDevice(PortsOnComputer[SelectedIndex], BaudRate);
+            else DisconnectFromDevice();
         });
+
+        private void OnNewSerialData(object s, SerialDataReceivedEventArgs e)
+        {
+            if (!(s is SerialPort port)) return;
+
+            string line = port.ReadLine();
+            Debug.WriteLine(line);
+        }
+
+        private void ConnectToDevice(string id, int baudRate)
+        {
+            _gpsModule.Port = new SerialPort(PortsOnComputer[SelectedIndex], BaudRate);
+            _gpsModule.Port.Open();
+            _gpsModule.IsConnected = _gpsModule.Port.IsOpen;
+
+            _gpsModule.Port.DataReceived += OnNewSerialData;
+        }
+
+        private void DisconnectFromDevice()
+        {
+            Debug.Assert(_gpsModule.Port != null, "_gpsModule.Port != null");
+            _gpsModule.Port.Close();
+            _gpsModule.IsConnected = _gpsModule.Port.IsOpen;
+            _gpsModule.Port.DataReceived -= OnNewSerialData;
+            _gpsModule.Port = null;
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

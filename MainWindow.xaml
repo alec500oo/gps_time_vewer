@@ -23,9 +23,9 @@
                         <Setter Property="FontSize" Value="14" />
                     </Style>
                 </StackPanel.Resources>
-                <ComboBox Width="100" Style="{StaticResource PanelStyle}" ItemsSource="{Binding PortsOnComputer}" SelectedIndex="0"/>
+                <ComboBox Width="100" Style="{StaticResource PanelStyle}" ItemsSource="{Binding PortsOnComputer}" SelectedIndex="{Binding SelectedIndex}"/>
                 <TextBox Width="100" Text="{Binding BaudRate}" Style="{StaticResource CtlStyle}" />
-                <Button Width="100" Command="{Binding ConnectToDevice}">
+                <Button Width="100" Command="{Binding ToggleConnection}">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource CtlStyle}">
                             <Setter Property="Content" Value="Connect"/>
